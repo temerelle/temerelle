@@ -12,6 +12,14 @@ import { formatDuration } from "@/lib/schedule";
 // Same horizon as the backend (BOOKING_RULES.horizonDays): today and 30 days on
 const DAYS = 31;
 
+// One part of the day at a time keeps the list short on a phone. Bounds by the start time
+const PARTS = [
+  { key: "morning", label: "Ранок", has: (time: string) => time < "12:00" },
+  { key: "day", label: "День", has: (time: string) => time >= "12:00" && time < "17:00" },
+  { key: "evening", label: "Вечір", has: (time: string) => time >= "17:00" },
+] as const;
+type Part = (typeof PARTS)[number]["key"];
+
 // Service → day → time → review → request. Prices and durations are shown from the service, but the server
 // takes them from its own data; the client only sends which service and which start
 export function BookingFlow({ business, services }: { business: Business; services: Service[] }) {
@@ -23,6 +31,8 @@ export function BookingFlow({ business, services }: { business: Business; servic
   const [service, setService] = useState<Service | null>(null);
   const [date, setDate] = useState(today);
   const [slot, setSlot] = useState<Slot | null>(null);
+  // null: the first part of the day that has free time
+  const [pickedPart, setPickedPart] = useState<Part | null>(null);
   // Slots belong to one service and date; a stale answer is ignored by its key
   const [loaded, setLoaded] = useState<{ key: string; slots: Slot[] | null; error: string } | null>(null);
   const [reload, setReload] = useState(0);
@@ -42,6 +52,12 @@ export function BookingFlow({ business, services }: { business: Business; servic
 
   const key = service ? `${service.id}|${date}|${reload}` : "";
   const current = loaded?.key === key ? loaded : null;
+  const counts = Object.fromEntries(
+    PARTS.map((p) => [p.key, current?.slots?.filter((s) => p.has(s.time)).length ?? 0]),
+  ) as Record<Part, number>;
+  const part =
+    pickedPart && counts[pickedPart] > 0 ? pickedPart : (PARTS.find((p) => counts[p.key] > 0)?.key ?? "morning");
+  const partSlots = current?.slots?.filter((s) => PARTS.find((p) => p.key === part)!.has(s.time)) ?? [];
 
   useEffect(() => {
     if (!service) return;
@@ -58,12 +74,14 @@ export function BookingFlow({ business, services }: { business: Business; servic
   function chooseService(next: Service) {
     setService(next);
     setSlot(null);
+    setPickedPart(null);
     setError("");
   }
 
   function chooseDate(next: string) {
     setDate(next);
     setSlot(null);
+    setPickedPart(null);
     setError("");
   }
 
@@ -172,27 +190,50 @@ export function BookingFlow({ business, services }: { business: Business; servic
           ) : current.slots?.length === 0 ? (
             <p className="text-subtle">На цей день вільного часу немає. Оберіть інший день.</p>
           ) : (
-            <div className="flex flex-wrap -m-1">
-              {current.slots?.map((s) => {
-                const selected = s.startsAt === slot?.startsAt;
-                return (
+            <>
+              <div
+                role="tablist"
+                aria-label="Частина дня"
+                className="flex bg-surface border border-line rounded-xl p-[3px] mb-3"
+              >
+                {PARTS.map((p) => (
                   <button
-                    key={s.startsAt}
+                    key={p.key}
                     type="button"
-                    aria-pressed={selected}
-                    onClick={() => {
-                      setSlot(s);
-                      setError("");
-                    }}
-                    className={`m-1 w-[calc(25%-0.5rem)] h-11 rounded-lg border font-medium transition-colors ${
-                      selected ? "btn-primary border-primary" : "bg-surface border-line hover:border-primary"
+                    role="tab"
+                    aria-selected={p.key === part}
+                    disabled={counts[p.key] === 0}
+                    onClick={() => setPickedPart(p.key)}
+                    className={`flex-1 h-10 rounded-[9px] text-sm font-medium transition-colors disabled:opacity-40 ${
+                      p.key === part ? "btn-primary" : "text-body"
                     }`}
                   >
-                    {s.time}
+                    {p.label} <span className="text-xs opacity-75 tabular-nums">{counts[p.key]}</span>
                   </button>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+              <div className="flex flex-wrap -m-1">
+                {partSlots.map((s) => {
+                  const selected = s.startsAt === slot?.startsAt;
+                  return (
+                    <button
+                      key={s.startsAt}
+                      type="button"
+                      aria-pressed={selected}
+                      onClick={() => {
+                        setSlot(s);
+                        setError("");
+                      }}
+                      className={`m-1 w-[calc(25%-0.5rem)] h-9 rounded-lg border text-sm font-medium tabular-nums transition-colors ${
+                        selected ? "btn-primary border-primary" : "bg-surface border-line hover:border-primary"
+                      }`}
+                    >
+                      {s.time}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
           )}
         </section>
       )}
