@@ -3,12 +3,16 @@ import { useState, type FormEvent } from "react";
 import { api, type Service } from "@/lib/api";
 import { errorText } from "@/lib/apiErrors";
 import { parsePrice, priceInputValue } from "@/lib/money";
-import { formatDuration } from "@/lib/schedule";
 import { Modal } from "@/components/ui/Modal";
 import { Field } from "@/components/ui/Field";
 
-// 15 minutes to 8 hours; the API allows up to 12
-const DURATIONS = Array.from({ length: 32 }, (_, i) => (i + 1) * 15);
+// Duration as a clock value: 90 minutes <-> "01:30"
+const toClock = (minutes: number) =>
+  `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
+const fromClock = (value: string) => {
+  const [h, m] = value.split(":").map(Number);
+  return h * 60 + m;
+};
 
 // Add a service (no `service`) or edit one
 export function ServiceDialog({
@@ -23,7 +27,7 @@ export function ServiceDialog({
   onSaved: (service: Service) => void;
 }) {
   const [name, setName] = useState(service?.name ?? "");
-  const [duration, setDuration] = useState(service?.durationMinutes ?? 60);
+  const [duration, setDuration] = useState(toClock(service?.durationMinutes ?? 60));
   const [price, setPrice] = useState(service ? priceInputValue(service.priceMinor) : "");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -32,9 +36,14 @@ export function ServiceDialog({
     e.preventDefault();
     const priceMinor = parsePrice(price);
     if (priceMinor === null) return setError("Вкажіть ціну числом, наприклад 500 або 499,50");
+    const durationMinutes = fromClock(duration);
+    // iOS wheels ignore step and min/max, so check here too
+    if (!(durationMinutes >= 15 && durationMinutes <= 720 && durationMinutes % 15 === 0)) {
+      return setError("Тривалість від 00:15 до 12:00, кратна 15 хвилинам");
+    }
     setBusy(true);
     setError("");
-    const input = { name, durationMinutes: duration, priceMinor };
+    const input = { name, durationMinutes, priceMinor };
     try {
       onSaved(
         service ? await api.updateService(businessId, service.id, input) : await api.createService(businessId, input),
@@ -52,23 +61,16 @@ export function ServiceDialog({
           {service ? "Редагувати послугу" : "Нова послуга"}
         </h2>
         <Field label="Назва" required maxLength={100} value={name} onChange={(e) => setName(e.target.value)} />
-        <div>
-          <label htmlFor="service-duration" className="block text-sm font-medium text-body mb-1.5">
-            Тривалість
-          </label>
-          <select
-            id="service-duration"
-            className="input-field border w-full h-12 px-4 rounded-lg"
-            value={duration}
-            onChange={(e) => setDuration(Number(e.target.value))}
-          >
-            {DURATIONS.map((minutes) => (
-              <option key={minutes} value={minutes}>
-                {formatDuration(minutes)}
-              </option>
-            ))}
-          </select>
-        </div>
+        <Field
+          label="Тривалість, год:хв"
+          type="time"
+          required
+          min="00:15"
+          max="12:00"
+          step={900}
+          value={duration}
+          onChange={(e) => setDuration(e.target.value)}
+        />
         <Field
           label="Ціна, ₴"
           inputMode="decimal"
