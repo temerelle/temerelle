@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { api, type User } from "@/lib/api";
+import { noopSubscribe, readAuthFlag } from "@/lib/authFlag";
 import { PageLayout } from "@/components/ui/PageLayout";
 
 // undefined = still checking; null = signed out
@@ -9,16 +10,21 @@ type Me = User | null | undefined;
 
 // Placeholder start page until the customer and owner screens (Phase 5)
 export default function HomePage() {
-  const [me, setMe] = useState<Me>(undefined);
+  // null on the server and during hydration
+  const flag = useSyncExternalStore<boolean | null>(noopSubscribe, readAuthFlag, () => null);
+  const [fetched, setFetched] = useState<Me>(undefined);
 
+  // No flag: signed out for sure, so no API call (and no 401 in the console)
   useEffect(() => {
+    if (!flag) return;
     api.me().then(
-      ({ user }) => setMe(user),
-      () => setMe(null),
+      ({ user }) => setFetched(user),
+      () => setFetched(null),
     );
-  }, []);
+  }, [flag]);
 
-  if (me === undefined) return <PageLayout loading />;
+  const me: Me = flag === false ? null : fetched;
+  if (flag === null || me === undefined) return <PageLayout loading />;
 
   return (
     <PageLayout className="items-center text-center">
