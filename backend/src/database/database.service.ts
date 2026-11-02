@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from './schema';
+import { withVerifiedSsl } from './connection-string';
 
 // node-postgres works with Neon (pooled URL) and a plain local Postgres alike, so integration tests use the real driver
 @Injectable()
@@ -9,7 +10,7 @@ export class DatabaseService implements OnModuleDestroy {
   private readonly logger = new Logger(DatabaseService.name);
   // Without a timeout a request waits forever for a database that is down
   private readonly pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: withVerifiedSsl(process.env.DATABASE_URL),
     max: 5,
     connectionTimeoutMillis: 5_000,
   });
