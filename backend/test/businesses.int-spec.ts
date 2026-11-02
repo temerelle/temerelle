@@ -132,7 +132,7 @@ describe('services', () => {
   it('bad duration or price: 400; another business cannot touch them', async () => {
     const { client, business } = await ownerWithBusiness();
     const base = `/businesses/${business.id}/services`;
-    expect((await client.post(base, { name: 'X', durationMinutes: 50, priceMinor: 100 })).status).toBe(400);
+    expect((await client.post(base, { name: 'X', durationMinutes: 0, priceMinor: 100 })).status).toBe(400);
     expect((await client.post(base, { name: 'X', durationMinutes: 60, priceMinor: 9.5 })).status).toBe(400);
     expect((await client.post(base, { name: 'X', durationMinutes: 60, priceMinor: -1 })).status).toBe(400);
 

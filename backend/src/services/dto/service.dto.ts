@@ -1,11 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsBoolean, IsDivisibleBy, IsInt, IsOptional, IsString, Length, Max, Min } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, IsString, Length, Max, Min } from 'class-validator';
 
 const trim = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
 
-// Durations follow the 15-minute slot step; prices are in kopiyky (minor units), never floats
-const DURATION = { min: 15, max: 720, step: 15 };
+// Any duration up to 12 hours; prices are in kopiyky (minor units), never floats
+const DURATION = { min: 1, max: 720 };
 const MAX_PRICE_MINOR = 10_000_000;
 
 export class CreateServiceDto {
@@ -15,12 +15,11 @@ export class CreateServiceDto {
   @Length(1, 100)
   name: string;
 
-  @ApiProperty({ example: 60, description: '15–720, in 15-minute steps' })
+  @ApiProperty({ example: 60, description: 'Minutes, 1–720' })
   @Type(() => Number)
   @IsInt()
   @Min(DURATION.min)
   @Max(DURATION.max)
-  @IsDivisibleBy(DURATION.step)
   durationMinutes: number;
 
   @ApiProperty({ example: 50000, description: 'Kopiyky: 50000 = 500 ₴' })
@@ -45,7 +44,6 @@ export class UpdateServiceDto {
   @IsInt()
   @Min(DURATION.min)
   @Max(DURATION.max)
-  @IsDivisibleBy(DURATION.step)
   durationMinutes?: number;
 
   @ApiPropertyOptional()

@@ -37,10 +37,7 @@ export function ServiceDialog({
     const priceMinor = parsePrice(price);
     if (priceMinor === null) return setError("Вкажіть ціну числом, наприклад 500 або 499,50");
     const durationMinutes = fromClock(duration);
-    // iOS wheels ignore step and min/max, so check here too
-    if (!(durationMinutes >= 15 && durationMinutes <= 720 && durationMinutes % 15 === 0)) {
-      return setError("Тривалість від 00:15 до 12:00, кратна 15 хвилинам");
-    }
+    if (!(durationMinutes > 0 && durationMinutes <= 720)) return setError("Тривалість до 12 годин");
     setBusy(true);
     setError("");
     const input = { name, durationMinutes, priceMinor };
@@ -65,9 +62,6 @@ export function ServiceDialog({
           label="Тривалість, год:хв"
           type="time"
           required
-          min="00:15"
-          max="12:00"
-          step={900}
           value={duration}
           onChange={(e) => setDuration(e.target.value)}
         />
