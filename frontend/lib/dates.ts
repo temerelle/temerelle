@@ -19,6 +19,26 @@ export function shortDay(localDate: string) {
   return new Intl.DateTimeFormat("uk-UA", { day: "numeric", month: "short", timeZone: "UTC" }).format(noon(localDate));
 }
 
+// "10:30" in the business's zone
+export function timeIn(iso: string, timeZone: string) {
+  return new Intl.DateTimeFormat("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone }).format(new Date(iso));
+}
+
+// 'YYYY-MM-DD' of a moment in the business's zone
+export const dateIn = (iso: string, timeZone: string) => todayIn(timeZone, new Date(iso));
+
+// 'YYYY-MM-DD' plus whole days, calendar arithmetic only
+export function addDays(localDate: string, days: number) {
+  const d = noon(localDate);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+// "Пн"
+export function weekdayShort(localDate: string) {
+  return new Intl.DateTimeFormat("uk-UA", { weekday: "short", timeZone: "UTC" }).format(noon(localDate));
+}
+
 // "20 жовт., 15:02" in the business's zone, for a moment from the API
 export function dateTimeIn(iso: string, timeZone: string) {
   return new Intl.DateTimeFormat("uk-UA", {

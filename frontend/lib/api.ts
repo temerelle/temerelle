@@ -1,8 +1,12 @@
 import type {
+  Availability,
+  BookingStatus,
   Business,
+  ClientBooking,
   HealthResponse,
   Interval,
   OwnBusiness,
+  OwnerBooking,
   ScheduleException,
   Service,
   User,
@@ -151,4 +155,28 @@ export const api = {
     post<ScheduleException>(`/businesses/${businessId}/exceptions`, input),
   deleteException: (businessId: string, exceptionId: string) =>
     del(`/businesses/${businessId}/exceptions/${exceptionId}`),
+
+  // Bookings: the client's side
+  availability: (businessId: string, serviceId: string, date: string) =>
+    get<Availability>(`/businesses/${businessId}/availability?serviceId=${serviceId}&date=${date}`),
+  requestBooking: (input: { businessId: string; serviceId: string; startsAt: string }) =>
+    post<ClientBooking>("/bookings", input),
+  myBookings: () => get<{ upcoming: ClientBooking[]; past: ClientBooking[] }>("/bookings/my"),
+  // The owner gets an OwnerBooking back; nobody reads it, the list reloads
+  cancelBooking: (bookingId: string, reason?: string) =>
+    post<ClientBooking>(`/bookings/${bookingId}/cancel`, { reason }),
+
+  // Bookings: the owner's side
+  ownerBookings: (businessId: string, query: { from?: string; to?: string; status?: BookingStatus }) =>
+    get<{ timezone: string; items: OwnerBooking[] }>(
+      `/businesses/${businessId}/bookings?${new URLSearchParams(query as Record<string, string>)}`,
+    ),
+  createManualBooking: (
+    businessId: string,
+    input: { serviceId: string; date: string; time: string; clientName: string; clientPhone?: string },
+  ) => post<OwnerBooking>(`/businesses/${businessId}/bookings`, input),
+  confirmBooking: (businessId: string, bookingId: string) =>
+    post<OwnerBooking>(`/businesses/${businessId}/bookings/${bookingId}/confirm`),
+  rejectBooking: (businessId: string, bookingId: string, reason?: string) =>
+    post<OwnerBooking>(`/businesses/${businessId}/bookings/${bookingId}/reject`, { reason }),
 };

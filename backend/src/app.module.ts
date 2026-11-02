@@ -6,8 +6,18 @@ import { AuthModule } from './auth/auth.module';
 import { BusinessesModule } from './businesses/businesses.module';
 import { ServicesModule } from './services/services.module';
 import { ScheduleModule } from './schedule/schedule.module';
+import { BookingsModule } from './bookings/bookings.module';
 
 @Module({
-  imports: [DatabaseModule, ClockModule, HealthModule, AuthModule, BusinessesModule, ServicesModule, ScheduleModule],
+  imports: [
+    DatabaseModule,
+    ClockModule,
+    HealthModule,
+    AuthModule,
+    BusinessesModule,
+    ServicesModule,
+    ScheduleModule,
+    BookingsModule,
+  ],
 })
 export class AppModule {}

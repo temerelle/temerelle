@@ -20,3 +20,5 @@ Deferred work and known limitations. Each item says why it waits.
 - [ ] **NestJS 12** (ESM-only) and **TypeScript 7**: upgrade as a separate step.
 - [ ] **Neon region.** The database is in `us-east-1` (Washington); Ukrainian users get ~100 ms extra per request. Moving means a new database and a data copy.
 - [ ] **Preview deployments** can't sign in: the API only accepts mutations from `FRONTEND_URL` (CSRF origin check).
+- [ ] **`completed` status.** Nothing sets it yet: past confirmed bookings stay `confirmed` and show under "Минулі". Set it when there is a use for it (statistics, no-shows), e.g. a daily Vercel cron.
+- [ ] **Bookings outside changed hours.** After a schedule change the owner sees such bookings in the calendar but no warning marks them.

@@ -108,6 +108,14 @@ export default function ProfilePage() {
         </button>
       </form>
 
+      <Link
+        href="/bookings"
+        className="block bg-surface border border-line rounded-xl px-4 py-4 mb-3 hover:border-primary transition-colors"
+      >
+        <span className="block font-medium text-heading">Мої записи</span>
+        <span className="block text-sm text-subtle">Майбутні й минулі, статус запитів</span>
+      </Link>
+
       {hasBusiness !== null && (
         <Link
           href={hasBusiness ? "/business" : "/business/new"}

@@ -7,9 +7,9 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { and, eq, gt, isNull, lt, or } from 'drizzle-orm';
+import { and, eq, gt, inArray, isNull, lt, or } from 'drizzle-orm';
 import { DatabaseService } from '../database/database.service';
-import { passwordResetTokens, sessions, users } from '../database/schema';
+import { bookings, passwordResetTokens, sessions, users } from '../database/schema';
 import { ClockService } from '../clock/clock.service';
 import { apiError } from '../common/api-error';
 import { hashToken, newToken } from './token';
@@ -214,8 +214,9 @@ export class AuthService {
     });
   }
 
-  // Bookings keep the client's name and snapshots (client_id becomes NULL). An owner can't leave businesses
-  // without an owner: the foreign key refuses, whatever was created in between
+  // Upcoming bookings are cancelled (nobody would come); all keep the client's name and snapshots (client_id
+  // becomes NULL). An owner can't leave businesses without an owner: the foreign key refuses, whatever was
+  // created in between
   async deleteAccount(userId: string, dto: DeleteAccountDto) {
     const [row] = await this.db
       .select({ passwordHash: users.passwordHash })
@@ -227,7 +228,19 @@ export class AuthService {
       throw new ForbiddenException(apiError('WRONG_PASSWORD'));
 
     try {
-      await this.db.delete(users).where(eq(users.id, userId));
+      await this.db.transaction(async (tx) => {
+        await tx
+          .update(bookings)
+          .set({ status: 'cancelled', cancelledBy: 'client', cancellationReason: 'Клієнт видалив акаунт' })
+          .where(
+            and(
+              eq(bookings.clientId, userId),
+              inArray(bookings.status, ['pending', 'confirmed']),
+              gt(bookings.startsAt, this.clock.now().toJSDate()),
+            ),
+          );
+        await tx.delete(users).where(eq(users.id, userId));
+      });
     } catch (err) {
       if (pgCode(err) === FOREIGN_KEY_VIOLATION) throw new ConflictException(apiError('OWNER_HAS_BUSINESSES'));
       throw err;

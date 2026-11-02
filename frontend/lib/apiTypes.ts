@@ -62,3 +62,47 @@ export interface ScheduleException {
   isDayOff: boolean;
   intervals: Interval[];
 }
+
+export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed";
+
+// A free start time: 'HH:MM' in the business's zone and the exact moment to send back
+export interface Slot {
+  time: string;
+  startsAt: string;
+}
+
+export interface Availability {
+  date: string;
+  timezone: string;
+  slots: Slot[];
+}
+
+interface BookingBase {
+  id: string;
+  serviceName: string;
+  priceMinor: number;
+  currency: string;
+  durationMinutes: number;
+  startsAt: string;
+  endsAt: string;
+  status: BookingStatus;
+  cancelledBy: "client" | "owner" | null;
+  cancellationReason: string | null;
+}
+
+// The client's view: which business, never other people
+export interface ClientBooking extends BookingBase {
+  // Active and not started yet (the server's clock)
+  canCancel: boolean;
+  business: { id: string; name: string; code: string; timezone: string };
+}
+
+// The owner's view: who booked; manual = added by the owner for someone without an account
+export interface OwnerBooking extends BookingBase {
+  // Pending and not started yet (the server's clock)
+  canConfirm: boolean;
+  clientName: string;
+  clientPhone: string | null;
+  manual: boolean;
+  createdAt: string;
+}

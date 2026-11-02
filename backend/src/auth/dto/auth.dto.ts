@@ -6,12 +6,12 @@ const trim = ({ value }: { value: unknown }) => (typeof value === 'string' ? val
 const normalizeEmail = ({ value }: { value: unknown }) =>
   typeof value === 'string' ? value.trim().toLowerCase() : value;
 // Empty string = no phone
-const optionalPhone = ({ value }: { value: unknown }) =>
+export const optionalPhone = ({ value }: { value: unknown }) =>
   typeof value === 'string' ? value.trim() || null : (value as null | undefined);
 
 // Upper bound keeps Argon2 work per request bounded
 const PASSWORD = { min: 8, max: 128 };
-const PHONE_PATTERN = /^\+?[0-9 ()-]{7,20}$/;
+export const PHONE_PATTERN = /^\+?[0-9 ()-]{7,20}$/;
 
 export class RegisterDto {
   @ApiProperty({ example: 'olena@example.com' })

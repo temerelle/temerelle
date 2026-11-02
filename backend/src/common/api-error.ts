@@ -20,6 +20,8 @@ export const API_ERRORS = {
   DATE_OUT_OF_RANGE: 'Date is in the past or too far ahead',
   // Bookings
   BOOKING_CONFLICT: 'Time is already taken',
+  BOOKING_NOT_FOUND: 'Booking not found',
+  BOOKING_NOT_CHANGEABLE: 'Booking can no longer be changed this way',
 } as const;
 
 export type ApiErrorCode = keyof typeof API_ERRORS;

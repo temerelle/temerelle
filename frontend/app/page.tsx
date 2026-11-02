@@ -41,6 +41,12 @@ export default function HomePage() {
             Знайти бізнес
           </Link>
           <Link
+            href="/bookings"
+            className="btn-secondary border flex items-center justify-center h-12 rounded-lg font-medium transition-colors"
+          >
+            Мої записи
+          </Link>
+          <Link
             href="/profile"
             className="btn-secondary border flex items-center justify-center h-12 rounded-lg font-medium transition-colors"
           >

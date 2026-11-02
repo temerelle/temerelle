@@ -21,6 +21,8 @@ export const ERROR_TEXT: Record<string, string> = {
   DATE_OUT_OF_RANGE: "Оберіть дату від сьогодні й не далі ніж на рік уперед.",
   // Bookings
   BOOKING_CONFLICT: "Цей час уже зайняли. Оберіть інший.",
+  BOOKING_NOT_FOUND: "Запис не знайдено. Оновіть сторінку.",
+  BOOKING_NOT_CHANGEABLE: "Цей запис уже не можна змінити. Оновіть сторінку.",
 };
 
 export const DEFAULT_ERROR = "Помилка. Спробуйте ще раз.";

@@ -3,9 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import type { Business, Service, WeekSchedule } from "@/lib/api";
-import { formatPrice } from "@/lib/money";
-import { formatDuration, formatIntervals, WEEKDAYS_SHORT } from "@/lib/schedule";
+import { formatIntervals, WEEKDAYS_SHORT } from "@/lib/schedule";
 import { PageLayout } from "@/components/ui/PageLayout";
+import { BookingFlow } from "./BookingFlow";
 
 // The link a business shares (Instagram, Viber, a QR code). Rendered on the server: the link preview gets the
 // business name, and the page shows without waiting for JS. Public data only
@@ -50,27 +50,7 @@ export default async function BusinessPage({ params }: Props) {
       <h1 className="text-2xl mb-2 break-words">{business.name}</h1>
       {business.description && <p className="text-body whitespace-pre-line mb-6">{business.description}</p>}
 
-      <section className="mb-8">
-        <h2 className="text-lg mb-3">Послуги</h2>
-        {services.length === 0 ? (
-          <p className="text-subtle">Послуг поки немає.</p>
-        ) : (
-          <ul className="space-y-3">
-            {services.map((service) => (
-              <li
-                key={service.id}
-                className="flex items-start justify-between bg-surface border border-line rounded-xl px-4 py-3"
-              >
-                <span className="min-w-0 pr-3">
-                  <span className="block font-medium text-heading break-words">{service.name}</span>
-                  <span className="block text-sm text-subtle">{formatDuration(service.durationMinutes)}</span>
-                </span>
-                <span className="font-medium text-heading whitespace-nowrap">{formatPrice(service.priceMinor)}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+      <BookingFlow business={business} services={services} />
 
       {schedule && (
         <section className="mb-8">
@@ -86,8 +66,6 @@ export default async function BusinessPage({ params }: Props) {
         </section>
       )}
 
-      {/* Booking comes in Phase 4; until then say so instead of a button that does nothing */}
-      <p className="text-subtle text-center mb-4">Онлайн-запис з&apos;явиться найближчим часом.</p>
       <Link href="/search" className="block text-center text-sm text-primary hover:underline">
         Шукати інший бізнес
       </Link>

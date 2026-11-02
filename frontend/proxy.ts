@@ -11,5 +11,5 @@ export function proxy(request: NextRequest) {
 
 // Pages that need an account; grows with the owner and booking screens
 export const config = {
-  matcher: ["/profile/:path*", "/business/:path*"],
+  matcher: ["/profile/:path*", "/business/:path*", "/bookings/:path*"],
 };

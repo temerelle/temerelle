@@ -4,14 +4,16 @@ import { useMyBusiness } from "@/lib/useMyBusiness";
 import { OwnerPage } from "@/components/business/OwnerPage";
 import { ShareLink } from "@/components/business/ShareLink";
 import { Badge } from "@/components/ui/Badge";
+import { PendingRequests } from "@/components/bookings/PendingRequests";
 
 const SECTIONS = [
+  { href: "/business/calendar", title: "Календар", text: "Записи по днях, додати запис вручну" },
   { href: "/business/services", title: "Послуги", text: "Що ви пропонуєте, скільки триває і коштує" },
   { href: "/business/schedule", title: "Розклад", text: "Робочі години, перерви, вихідні" },
   { href: "/business/settings", title: "Налаштування", text: "Назва, опис, код, прийом записів" },
 ];
 
-// The owner's home until the dashboard with bookings (Phase 4)
+// The owner's home: new requests first, then the sections
 export default function BusinessHomePage() {
   const { business, error } = useMyBusiness("/business");
 
@@ -27,6 +29,7 @@ export default function BusinessHomePage() {
           <Badge tone={business.isActive ? "ok" : "none"} size="status">
             {business.isActive ? "Приймає записи" : "Записи вимкнено"}
           </Badge>
+          <PendingRequests businessId={business.id} timezone={business.timezone} />
           <ShareLink code={business.code} name={business.name} />
           <nav className="space-y-3">
             {SECTIONS.map((section) => (

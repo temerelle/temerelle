@@ -15,7 +15,7 @@ const EXCEPTION_HORIZON_DAYS = 365;
 const invalid = (problem: string) => new BadRequestException(apiError('SCHEDULE_INVALID', problem));
 
 // The schedule belongs to the business's default resource (MVP). Saving it never touches existing bookings:
-// a booking outside the new hours stays, and Phase 4 shows it to the owner
+// a booking outside the new hours stays in the owner's calendar, and the owner decides
 @Injectable()
 export class ScheduleService {
   constructor(

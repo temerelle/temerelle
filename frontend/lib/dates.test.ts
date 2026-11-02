@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dateTimeIn, ddmm, longDay, shortDay, todayIn } from "@/lib/dates";
+import { addDays, dateIn, dateTimeIn, ddmm, longDay, shortDay, timeIn, todayIn } from "@/lib/dates";
 
 describe("todayIn", () => {
   it("the business's date, not the browser's, around midnight", () => {
@@ -59,5 +59,19 @@ describe("dateTimeIn", () => {
 
   it("another business zone", () => {
     expect(dateTimeIn("2026-10-20T12:02:00.000Z", "Europe/Warsaw")).toBe("20 жовт., 14:02");
+  });
+});
+
+describe("addDays / dateIn / timeIn", () => {
+  it("calendar days across months and the DST change", () => {
+    expect(addDays("2026-10-31", 1)).toBe("2026-11-01");
+    expect(addDays("2026-03-01", -1)).toBe("2026-02-28");
+    expect(addDays("2026-10-24", 1)).toBe("2026-10-25");
+  });
+
+  it("date and time of a moment on the business's clock", () => {
+    // 22:30 UTC on Nov 10 is 00:30 on Nov 11 in Kyiv
+    expect(dateIn("2026-11-10T22:30:00Z", "Europe/Kyiv")).toBe("2026-11-11");
+    expect(timeIn("2026-11-10T22:30:00Z", "Europe/Kyiv")).toBe("00:30");
   });
 });
