@@ -32,11 +32,17 @@ export default function HomePage() {
       <p className="text-subtle mb-8">Онлайн-запис для малого бізнесу.</p>
 
       {me ? (
-        <div className="space-y-4">
-          <p>Вітаємо, {me.name}!</p>
+        <div className="w-full max-w-xs mx-auto flex flex-col space-y-3">
+          <p className="mb-2">Вітаємо, {me.name}!</p>
+          <Link
+            href="/search"
+            className="btn-primary flex items-center justify-center h-12 rounded-lg font-medium transition-colors"
+          >
+            Знайти бізнес
+          </Link>
           <Link
             href="/profile"
-            className="btn-secondary border inline-flex items-center justify-center h-12 px-6 rounded-lg font-medium transition-colors"
+            className="btn-secondary border flex items-center justify-center h-12 rounded-lg font-medium transition-colors"
           >
             Профіль
           </Link>
@@ -54,6 +60,9 @@ export default function HomePage() {
             className="btn-secondary border flex items-center justify-center h-12 rounded-lg font-medium transition-colors"
           >
             Створити акаунт
+          </Link>
+          <Link href="/search" className="text-sm text-primary hover:underline pt-2">
+            Знайти бізнес без входу
           </Link>
         </div>
       )}

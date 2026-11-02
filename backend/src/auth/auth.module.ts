@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { AuthGuard } from './auth.guard';
+import { AuthGuard, OptionalAuthGuard } from './auth.guard';
 import { RateLimitService } from './rate-limit.service';
 import { ACCESS_TOKEN_TTL_SECONDS } from './auth.constants';
 
@@ -17,8 +17,8 @@ import { ACCESS_TOKEN_TTL_SECONDS } from './auth.constants';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthGuard, RateLimitService],
+  providers: [AuthService, AuthGuard, OptionalAuthGuard, RateLimitService],
   // Other modules protect their routes with AuthGuard
-  exports: [AuthGuard, JwtModule],
+  exports: [AuthGuard, OptionalAuthGuard, JwtModule],
 })
 export class AuthModule {}

@@ -1,4 +1,13 @@
-import type { HealthResponse, User } from "./apiTypes";
+import type {
+  Business,
+  HealthResponse,
+  Interval,
+  OwnBusiness,
+  ScheduleException,
+  Service,
+  User,
+  WeekSchedule,
+} from "./apiTypes";
 import { readAuthFlag, setAuthFlag } from "./authFlag";
 
 // Callers import the types from here, together with `api`
@@ -89,6 +98,7 @@ async function request<T>(path: string, method = "GET", body?: unknown, retried 
 
 const get = <T>(path: string) => request<T>(path);
 const post = <T = Ok>(path: string, body?: unknown) => request<T>(path, "POST", body);
+const put = <T = Ok>(path: string, body?: unknown) => request<T>(path, "PUT", body);
 const patch = <T = Ok>(path: string, body?: unknown) => request<T>(path, "PATCH", body);
 const del = <T = Ok>(path: string, body?: unknown) => request<T>(path, "DELETE", body);
 
@@ -109,4 +119,36 @@ export const api = {
   // Ends every session of the account, this one too
   resetPassword: (token: string, password: string) => signedOut(post("/auth/reset-password", { token, password })),
   deleteAccount: (password: string) => signedOut(del("/auth/account", { password })),
+
+  // Businesses
+  searchBusinesses: (q: string) => get<{ items: Business[] }>(`/businesses?q=${encodeURIComponent(q)}`),
+  business: (idOrCode: string) => get<Business>(`/businesses/${encodeURIComponent(idOrCode)}`),
+  myBusinesses: () => get<{ items: OwnBusiness[] }>("/businesses/mine"),
+  createBusiness: (input: { name: string; description?: string; code?: string }) =>
+    post<OwnBusiness>("/businesses", input),
+  updateBusiness: (
+    id: string,
+    input: Partial<{ name: string; description: string; code: string; isActive: boolean }>,
+  ) => patch<OwnBusiness>(`/businesses/${id}`, input),
+
+  // Services: clients get the active ones, the owner can ask for all
+  services: (businessId: string, includeInactive = false) =>
+    get<{ items: Service[] }>(`/businesses/${businessId}/services${includeInactive ? "?includeInactive=true" : ""}`),
+  createService: (businessId: string, input: { name: string; durationMinutes: number; priceMinor: number }) =>
+    post<Service>(`/businesses/${businessId}/services`, input),
+  updateService: (
+    businessId: string,
+    serviceId: string,
+    input: Partial<{ name: string; durationMinutes: number; priceMinor: number; isActive: boolean }>,
+  ) => patch<Service>(`/businesses/${businessId}/services/${serviceId}`, input),
+
+  // Schedule
+  schedule: (businessId: string) => get<WeekSchedule>(`/businesses/${businessId}/schedule`),
+  saveSchedule: (businessId: string, days: WeekSchedule["days"]) =>
+    put<WeekSchedule>(`/businesses/${businessId}/schedule`, { days }),
+  exceptions: (businessId: string) => get<{ items: ScheduleException[] }>(`/businesses/${businessId}/exceptions`),
+  setException: (businessId: string, input: { date: string; isDayOff: boolean; intervals?: Interval[] }) =>
+    post<ScheduleException>(`/businesses/${businessId}/exceptions`, input),
+  deleteException: (businessId: string, exceptionId: string) =>
+    del(`/businesses/${businessId}/exceptions/${exceptionId}`),
 };

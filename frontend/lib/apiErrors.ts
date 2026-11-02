@@ -11,6 +11,14 @@ export const ERROR_TEXT: Record<string, string> = {
   WRONG_PASSWORD: "Неправильний пароль",
   OWNER_HAS_BUSINESSES: "Акаунт власника бізнесу поки не можна видалити.",
   FORBIDDEN_ORIGIN: "Запит відхилено з міркувань безпеки. Оновіть сторінку.",
+  // Businesses, services, schedule
+  BUSINESS_NOT_FOUND: "Бізнес не знайдено",
+  CODE_TAKEN: "Цей код уже зайнятий. Спробуйте інший.",
+  INVALID_TIMEZONE: "Невідомий часовий пояс",
+  SERVICE_NOT_FOUND: "Послугу не знайдено. Оновіть сторінку.",
+  SCHEDULE_INVALID: "Перевірте години: кінець має бути після початку, інтервали не мають перетинатися.",
+  EXCEPTION_NOT_FOUND: "Цей виняток уже видалено. Оновіть сторінку.",
+  DATE_OUT_OF_RANGE: "Оберіть дату від сьогодні й не далі ніж на рік уперед.",
   // Bookings
   BOOKING_CONFLICT: "Цей час уже зайняли. Оберіть інший.",
 };

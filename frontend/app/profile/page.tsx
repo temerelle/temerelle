@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { api, statusOf, type User } from "@/lib/api";
 import { errorText } from "@/lib/apiErrors";
@@ -15,6 +16,8 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
+  // null until known: the link reads "Мій бізнес" or "Створити бізнес"
+  const [hasBusiness, setHasBusiness] = useState<boolean | null>(null);
 
   useEffect(() => {
     api.me().then(
@@ -29,6 +32,13 @@ export default function ProfilePage() {
       },
     );
   }, [router]);
+
+  useEffect(() => {
+    api.myBusinesses().then(
+      ({ items }) => setHasBusiness(items.length > 0),
+      () => setHasBusiness(null),
+    );
+  }, []);
 
   async function save(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -97,6 +107,20 @@ export default function ProfilePage() {
           {saving ? "Зберігаємо…" : "Зберегти"}
         </button>
       </form>
+
+      {hasBusiness !== null && (
+        <Link
+          href={hasBusiness ? "/business" : "/business/new"}
+          className="block bg-surface border border-line rounded-xl px-4 py-4 mb-6 hover:border-primary transition-colors"
+        >
+          <span className="block font-medium text-heading">{hasBusiness ? "Мій бізнес" : "У мене є бізнес"}</span>
+          <span className="block text-sm text-subtle">
+            {hasBusiness
+              ? "Послуги, розклад, посилання для клієнтів"
+              : "Створіть сторінку, щоб клієнти записувалися онлайн"}
+          </span>
+        </Link>
+      )}
 
       <div className="space-y-3 border-t border-line pt-6">
         <button

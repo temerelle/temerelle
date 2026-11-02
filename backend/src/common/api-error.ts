@@ -10,6 +10,14 @@ export const API_ERRORS = {
   WRONG_PASSWORD: 'Wrong password',
   OWNER_HAS_BUSINESSES: 'Account owns businesses',
   FORBIDDEN_ORIGIN: 'Request origin is not allowed',
+  // Businesses, services, schedule
+  BUSINESS_NOT_FOUND: 'Business not found',
+  CODE_TAKEN: 'Business code is already taken',
+  INVALID_TIMEZONE: 'Unknown time zone',
+  SERVICE_NOT_FOUND: 'Service not found',
+  SCHEDULE_INVALID: 'Working hours are not valid',
+  EXCEPTION_NOT_FOUND: 'Schedule exception not found',
+  DATE_OUT_OF_RANGE: 'Date is in the past or too far ahead',
   // Bookings
   BOOKING_CONFLICT: 'Time is already taken',
 } as const;
