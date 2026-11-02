@@ -39,7 +39,7 @@ export class BusinessesService {
     return this.database.db;
   }
 
-  // Active businesses by name (anywhere in it) or code (its start); an exact code comes first
+  // Active businesses by part of the name or of the code; an exact code comes first
   async search(query: string | undefined, page = 1) {
     const q = query?.trim().toLowerCase() ?? '';
     if (q.length < 2) return { items: [], page, pageSize: SEARCH_PAGE_SIZE };
@@ -48,7 +48,7 @@ export class BusinessesService {
       .select()
       .from(businesses)
       .where(
-        and(eq(businesses.isActive, true), or(ilike(businesses.name, `%${text}%`), like(businesses.code, `${text}%`))),
+        and(eq(businesses.isActive, true), or(ilike(businesses.name, `%${text}%`), like(businesses.code, `%${text}%`))),
       )
       .orderBy(desc(sql`${businesses.code} = ${q}`), asc(businesses.name))
       .limit(SEARCH_PAGE_SIZE)

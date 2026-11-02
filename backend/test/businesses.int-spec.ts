@@ -89,7 +89,7 @@ describe('businesses', () => {
     expect((await client.get(`/businesses/${business.code}`)).status).toBe(200);
   });
 
-  it('search: by part of the name or the start of the code; LIKE wildcards are literal', async () => {
+  it('search: by part of the name or of the code; LIKE wildcards are literal', async () => {
     const stamp = Date.now();
     const { business } = await ownerWithBusiness(`Барбершоп Борода ${stamp}`);
     const visitor = new Client(t.baseUrl);
@@ -97,6 +97,9 @@ describe('businesses', () => {
       business.id,
     );
     expect((await visitor.get(`/businesses?q=${business.code}`)).body.items[0].id).toBe(business.id);
+    expect(
+      (await visitor.get(`/businesses?q=${business.code.slice(-6)}`)).body.items.map((b: { id: string }) => b.id),
+    ).toContain(business.id);
     expect((await visitor.get('/businesses?q=%25%25')).body.items).toEqual([]);
     expect((await visitor.get('/businesses?q=a')).body.items).toEqual([]);
   });
