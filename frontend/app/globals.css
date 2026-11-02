@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+/* Temerelle: calm, light, trustworthy. The full design system comes in Phase 5; these tokens are its start */
+:root {
+  --background: #f7f5f1;
+  --foreground: #1d2330;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+
+  /* Brand */
+  --color-primary: #2f5d50;
+  --color-primary-hover: #26493f;
+  --color-on-primary: #ffffff;
+
+  /* Text */
+  --color-heading: #1d2330;
+  --color-body: #3a4150;
+  --color-subtle: #5f6675; /* secondary text that must stay readable (4.5:1 on the background) */
+
+  /* Waiting state (pending confirmation) */
+  --color-warn: #8a5a00;
+  --color-warn-bg: #fdf3dc;
+  --color-warn-line: #f0d9a0;
+
+  /* UI */
+  --color-surface: #ffffff;
+  --color-line: #e6e1d8;
+  --color-danger: #b42318;
+}
+
+body {
+  color: var(--foreground);
+  background-color: var(--background);
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  button {
+    @apply cursor-pointer;
+  }
+  button:disabled {
+    @apply cursor-not-allowed;
+  }
+  a,
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-semibold tracking-tight text-heading;
+  }
+}
+
+/* ── Semantic component classes: all color decisions in one place ── */
+@layer components {
+  .btn-primary {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+  }
+
+  /* Outlined button; add `border` class for border-width */
+  .btn-secondary {
+    background-color: transparent;
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  }
+
+  .btn-danger {
+    background-color: color-mix(in srgb, var(--color-danger) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-danger) 30%, transparent);
+    color: var(--color-danger);
+  }
+  .btn-danger:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--color-danger) 14%, transparent);
+    border-color: var(--color-danger);
+  }
+
+  /* Form inputs / textareas; add `border` class for border-width */
+  .input-field {
+    background-color: var(--color-surface);
+    border-color: var(--color-line);
+    color: var(--color-body);
+  }
+  .input-field:focus {
+    border-color: var(--color-primary);
+    outline: none;
+  }
+  .input-field::placeholder {
+    color: var(--color-subtle);
+    opacity: 0.7;
+  }
+}

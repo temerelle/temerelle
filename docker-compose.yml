@@ -1,0 +1,15 @@
+# Local PostgreSQL for development and integration tests: docker compose up -d
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: temerelle
+      POSTGRES_PASSWORD: temerelle
+      POSTGRES_DB: temerelle
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
