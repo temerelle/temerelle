@@ -65,6 +65,8 @@ export const sessions = pgTable(
     tokenHash: text('token_hash').notNull().unique(),
     expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
     revokedAt: timestamp('revoked_at', { withTimezone: true }),
+    // Set when revoked by rotation (not by logout): presenting it again later means the token was stolen
+    rotatedAt: timestamp('rotated_at', { withTimezone: true }),
     createdAt: createdAt(),
   },
   (table) => [index('sessions_user_id_idx').on(table.userId)],
@@ -287,4 +289,15 @@ export const pushSubscriptions = pgTable(
     createdAt: createdAt(),
   },
   (table) => [index('push_subscriptions_user_id_idx').on(table.userId)],
+);
+
+// Fixed-window counters for auth rate limits (no Redis). Key: '<action>:<ip or email>'
+export const rateLimits = pgTable(
+  'rate_limits',
+  {
+    key: text('key').primaryKey(),
+    windowStart: timestamp('window_start', { withTimezone: true }).notNull(),
+    count: integer('count').notNull(),
+  },
+  (table) => [index('rate_limits_window_start_idx').on(table.windowStart)],
 );

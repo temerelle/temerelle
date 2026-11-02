@@ -26,6 +26,10 @@ export function envProblems(env: Env): string[] {
     else if (!isUrl(env[name])) problems.push(`${name} is not a URL`);
   }
 
+  // Signs access tokens (HS256): long and random, e.g. `openssl rand -base64 48`
+  if (!env.JWT_SECRET) problems.push('JWT_SECRET is missing');
+  else if (env.JWT_SECRET.length < 32) problems.push('JWT_SECRET must be at least 32 characters');
+
   if (env.DATABASE_URL_UNPOOLED && !isUrl(env.DATABASE_URL_UNPOOLED))
     problems.push('DATABASE_URL_UNPOOLED is not a URL');
 

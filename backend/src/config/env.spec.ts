@@ -1,6 +1,10 @@
 import { envProblems, validateEnv } from './env';
 
-const MINIMAL = { DATABASE_URL: 'postgresql://user:pass@host/db', FRONTEND_URL: 'http://localhost:3000' };
+const MINIMAL = {
+  DATABASE_URL: 'postgresql://user:pass@host/db',
+  FRONTEND_URL: 'http://localhost:3000',
+  JWT_SECRET: 'x'.repeat(32),
+};
 
 const FULL = {
   ...MINIMAL,
@@ -13,7 +17,7 @@ const FULL = {
 };
 
 describe('envProblems', () => {
-  it('a local setup needs only the database and the frontend address', () => {
+  it('a local setup needs only the database, the frontend address and the JWT secret', () => {
     expect(envProblems(MINIMAL)).toEqual([]);
   });
 
@@ -22,9 +26,13 @@ describe('envProblems', () => {
   });
 
   it('missing or broken URLs', () => {
-    expect(envProblems({})).toEqual(['DATABASE_URL is missing', 'FRONTEND_URL is missing']);
+    expect(envProblems({})).toEqual(['DATABASE_URL is missing', 'FRONTEND_URL is missing', 'JWT_SECRET is missing']);
     expect(envProblems({ ...MINIMAL, DATABASE_URL: 'not a url' })).toEqual(['DATABASE_URL is not a URL']);
     expect(envProblems({ ...MINIMAL, DATABASE_URL_UNPOOLED: 'nope' })).toEqual(['DATABASE_URL_UNPOOLED is not a URL']);
+  });
+
+  it('JWT_SECRET is long enough', () => {
+    expect(envProblems({ ...MINIMAL, JWT_SECRET: 'short' })).toEqual(['JWT_SECRET must be at least 32 characters']);
   });
 
   it('push keys: all or none', () => {
@@ -41,7 +49,9 @@ describe('envProblems', () => {
 
 describe('validateEnv', () => {
   it('throws one error listing every problem', () => {
-    expect(() => validateEnv({})).toThrow('Invalid environment:\n- DATABASE_URL is missing\n- FRONTEND_URL is missing');
+    expect(() => validateEnv({})).toThrow(
+      'Invalid environment:\n- DATABASE_URL is missing\n- FRONTEND_URL is missing\n- JWT_SECRET is missing',
+    );
   });
 
   it('passes a good setup', () => {

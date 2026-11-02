@@ -33,8 +33,8 @@ export default tseslint.config(
     },
   },
   {
-    // Tests mock the DB and services with `as any`
-    files: ['**/*.spec.ts'],
+    // Tests mock the DB and services with `as any`; integration tests read raw SQL rows
+    files: ['**/*.spec.ts', 'test/**/*.ts'],
     rules: {
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',

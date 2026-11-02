@@ -3,6 +3,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import type { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
+import { originCheck } from './common/origin-check';
 
 export const API_PREFIX = 'api/v1';
 
@@ -16,13 +17,14 @@ export function configureApp(app: INestApplication) {
   app.use((req: Request, res: Response, next: NextFunction) =>
     req.path.startsWith(`/${API_PREFIX}/docs`) ? docsHelmet(req, res, next) : apiHelmet(req, res, next),
   );
-  app.enableCors({
-    origin: process.env.FRONTEND_URL ?? 'http://localhost:3000',
-    credentials: true,
-  });
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000';
+  app.enableCors({ origin: frontendUrl, credentials: true });
+  // CSRF: mutations only from our frontend (Swagger "Try it out" works through the frontend's /api rewrite)
+  app.use(originCheck(new URL(frontendUrl).origin));
+  // transform: DTO @Transform (trim, lower-case email) reaches the handler
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.use(cookieParser());
 
-  const openApi = new DocumentBuilder().setTitle('Temerelle API').setVersion('1').build();
+  const openApi = new DocumentBuilder().setTitle('Temerelle API').setVersion('1').addCookieAuth('access_token').build();
   SwaggerModule.setup(`${API_PREFIX}/docs`, app, () => SwaggerModule.createDocument(app, openApi));
 }
