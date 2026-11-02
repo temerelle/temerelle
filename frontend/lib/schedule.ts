@@ -1,8 +1,6 @@
 import type { Interval } from "./api";
 
 // Same rules as backend/src/schedule/rules.ts, in Ukrainian, so the form explains a problem before saving
-export const STEP_MINUTES = 15;
-
 export const WEEKDAYS = ["Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота", "Неділя"];
 export const WEEKDAYS_SHORT = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"];
 
@@ -13,10 +11,6 @@ export const toMinutes = (time: string) => {
 
 export const fromMinutes = (minutes: number) =>
   `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
-
-// Every 15 minutes of a day; ends may also be 24:00
-export const START_TIMES = Array.from({ length: (24 * 60) / STEP_MINUTES }, (_, i) => fromMinutes(i * STEP_MINUTES));
-export const END_TIMES = [...START_TIMES.slice(1), "24:00"];
 
 export function intervalsProblem(intervals: Interval[]): string | null {
   const sorted = [...intervals].sort((a, b) => toMinutes(a.start) - toMinutes(b.start));

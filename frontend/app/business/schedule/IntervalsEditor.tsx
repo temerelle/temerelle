@@ -1,6 +1,6 @@
 "use client";
 import type { Interval } from "@/lib/api";
-import { END_TIMES, nextInterval, START_TIMES } from "@/lib/schedule";
+import { nextInterval } from "@/lib/schedule";
 
 // The working intervals of one day; gaps between them are breaks. Used by the week and by a date's own hours
 export function IntervalsEditor({
@@ -19,18 +19,17 @@ export function IntervalsEditor({
     <div className="space-y-2">
       {intervals.map((interval, index) => (
         <div key={index} className="flex items-center space-x-2">
-          <TimeSelect
+          <TimeInput
             label={`${label}: початок ${index + 1}`}
             value={interval.start}
-            options={START_TIMES}
             onChange={(start) => update(index, { start })}
           />
           <span className="text-subtle">–</span>
-          <TimeSelect
+          {/* A clock has no 24:00: midnight as an end shows and is picked as 00:00 */}
+          <TimeInput
             label={`${label}: кінець ${index + 1}`}
-            value={interval.end}
-            options={END_TIMES}
-            onChange={(end) => update(index, { end })}
+            value={interval.end === "24:00" ? "00:00" : interval.end}
+            onChange={(end) => update(index, { end: end === "00:00" ? "24:00" : end })}
           />
           <button
             type="button"
@@ -53,29 +52,15 @@ export function IntervalsEditor({
   );
 }
 
-function TimeSelect({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  options: string[];
-  onChange: (value: string) => void;
-}) {
+function TimeInput({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
   return (
-    <select
+    <input
+      type="time"
+      required
       aria-label={label}
       className="input-field border h-11 px-3 rounded-lg flex-1 min-w-0"
       value={value}
       onChange={(e) => onChange(e.target.value)}
-    >
-      {options.map((time) => (
-        <option key={time} value={time}>
-          {time}
-        </option>
-      ))}
-    </select>
+    />
   );
 }

@@ -1,5 +1,4 @@
-// Working hours rules, pure so they are unit-tested. Times are 'HH:MM' on a 15-minute grid; '24:00' ends a day
-export const SCHEDULE_STEP_MINUTES = 15;
+// Working hours rules, pure so they are unit-tested. Times are 'HH:MM'; '24:00' ends a day
 export const MAX_INTERVALS_PER_DAY = 6;
 
 export interface Interval {
@@ -25,8 +24,6 @@ export function intervalsProblem(intervals: Interval[]): string | null {
     .map(({ start, end }) => ({ start: toMinutes(start), end: toMinutes(end), label: `${start}–${end}` }))
     .sort((a, b) => a.start - b.start);
   for (const [i, interval] of sorted.entries()) {
-    if (interval.start % SCHEDULE_STEP_MINUTES || interval.end % SCHEDULE_STEP_MINUTES)
-      return `${interval.label}: times must be in ${SCHEDULE_STEP_MINUTES}-minute steps`;
     if (interval.start >= 24 * 60) return `${interval.label}: 24:00 can only end a day`;
     if (interval.end <= interval.start) return `${interval.label}: the end must be after the start`;
     const previous = sorted[i - 1];

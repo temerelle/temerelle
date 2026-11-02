@@ -1,22 +1,7 @@
 import { describe, expect, it } from "vitest";
-import {
-  END_TIMES,
-  formatDuration,
-  formatIntervals,
-  intervalsProblem,
-  nextInterval,
-  START_TIMES,
-} from "@/lib/schedule";
+import { formatDuration, formatIntervals, intervalsProblem, nextInterval } from "@/lib/schedule";
 
 describe("schedule helpers", () => {
-  it("time options every 15 minutes; only ends reach 24:00", () => {
-    expect(START_TIMES).toHaveLength(96);
-    expect(START_TIMES[0]).toBe("00:00");
-    expect(START_TIMES.at(-1)).toBe("23:45");
-    expect(END_TIMES[0]).toBe("00:15");
-    expect(END_TIMES.at(-1)).toBe("24:00");
-  });
-
   it("explains a problem in Ukrainian, or null when fine", () => {
     expect(
       intervalsProblem([

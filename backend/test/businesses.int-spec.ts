@@ -203,7 +203,7 @@ describe('schedule', () => {
     expect(overlap.status).toBe(400);
     expect(overlap.body.code).toBe('SCHEDULE_INVALID');
     expect(
-      (await client.request('PUT', url, { days: [{ dayOfWeek: 2, intervals: [{ start: '09:10', end: '17:00' }] }] }))
+      (await client.request('PUT', url, { days: [{ dayOfWeek: 2, intervals: [{ start: '17:00', end: '09:00' }] }] }))
         .status,
     ).toBe(400);
     expect((await client.get(url)).body.days[1].intervals).toEqual([{ start: '09:00', end: '17:00' }]);

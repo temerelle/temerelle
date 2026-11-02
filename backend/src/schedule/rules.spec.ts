@@ -33,10 +33,10 @@ describe('schedule rules', () => {
     ).toBe('09:00–13:00 and 12:00–18:00 overlap');
   });
 
-  it('end after start, 15-minute steps, 24:00 not as a start', () => {
+  it('end after start, any minute, 24:00 not as a start', () => {
     expect(intervalsProblem([{ start: '18:00', end: '09:00' }])).toMatch(/end must be after the start/);
     expect(intervalsProblem([{ start: '10:00', end: '10:00' }])).toMatch(/end must be after the start/);
-    expect(intervalsProblem([{ start: '09:10', end: '10:00' }])).toMatch(/15-minute steps/);
+    expect(intervalsProblem([{ start: '09:10', end: '10:00' }])).toBeNull();
     expect(intervalsProblem([{ start: '24:00', end: '24:00' }])).toMatch(/24:00 can only end a day/);
   });
 
