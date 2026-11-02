@@ -80,6 +80,13 @@ describe('bookings', () => {
     expect((await visitor.post('/bookings', { businessId, serviceId, startsAt: at('12:00') })).status).toBe(401);
   });
 
+  it("the owner can't request their own business: they add bookings in the calendar", async () => {
+    const { owner, businessId, serviceId } = await shop();
+    const res = await owner.post('/bookings', { businessId, serviceId, startsAt: at('10:00') });
+    expect(res.status).toBe(409);
+    expect(res.body.code).toBe('OWN_BUSINESS');
+  });
+
   it('two clients at once for the same time: exactly one gets it', async () => {
     const { businessId, serviceId } = await shop();
     const [a, b] = await Promise.all([signedIn(), signedIn()]);

@@ -22,6 +22,7 @@ export const API_ERRORS = {
   BOOKING_CONFLICT: 'Time is already taken',
   BOOKING_NOT_FOUND: 'Booking not found',
   BOOKING_NOT_CHANGEABLE: 'Booking can no longer be changed this way',
+  OWN_BUSINESS: 'Owners add bookings to their own business in the calendar',
 } as const;
 
 export type ApiErrorCode = keyof typeof API_ERRORS;

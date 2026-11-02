@@ -29,6 +29,16 @@ export function BookingFlow({ business, services }: { business: Business; servic
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState<ClientBooking | null>(null);
+  // The owner looking at their own page: a preview, no request button
+  const [isOwner, setIsOwner] = useState(false);
+
+  useEffect(() => {
+    if (!signedIn) return;
+    api.myBusinesses().then(
+      ({ items }) => setIsOwner(items.some((b) => b.id === business.id)),
+      () => {},
+    );
+  }, [signedIn, business.id]);
 
   const key = service ? `${service.id}|${date}|${reload}` : "";
   const current = loaded?.key === key ? loaded : null;
@@ -203,7 +213,15 @@ export function BookingFlow({ business, services }: { business: Business; servic
             <Row label="Ціна" value={formatPrice(service.priceMinor)} />
           </dl>
           <p className="text-sm text-subtle mb-4">Після запиту {business.name} підтвердить запис. Оплата на місці.</p>
-          {signedIn === false ? (
+          {isOwner ? (
+            <div className="text-sm text-body bg-background border border-line rounded-lg p-3">
+              Це ваш бізнес: так клієнти бачать запис. Щоб записати когось самостійно, відкрийте{" "}
+              <Link href="/business/calendar" className="text-primary hover:underline">
+                Календар
+              </Link>
+              .
+            </div>
+          ) : signedIn === false ? (
             <Link
               href={`/login?next=${encodeURIComponent(`/b/${business.code}`)}`}
               className="btn-primary flex items-center justify-center h-12 rounded-lg font-medium transition-colors"

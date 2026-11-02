@@ -86,6 +86,8 @@ export class BookingsService {
   // A client's request: pending until the owner decides. The start must be one the availability offers now
   async request(userId: string, dto: CreateBookingDto) {
     const business = await this.access.visible(dto.businessId, undefined);
+    // The owner's own page is a preview; their bookings go through createManual
+    if (business.ownerId === userId) throw new ConflictException(apiError('OWN_BUSINESS'));
     const service = await this.activeService(business.id, dto.serviceId);
     const startsAt = DateTime.fromISO(dto.startsAt, { setZone: true });
     const date = startsAt.setZone(business.timezone).toISODate()!;

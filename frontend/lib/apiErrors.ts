@@ -23,6 +23,7 @@ export const ERROR_TEXT: Record<string, string> = {
   BOOKING_CONFLICT: "Цей час уже зайняли. Оберіть інший.",
   BOOKING_NOT_FOUND: "Запис не знайдено. Оновіть сторінку.",
   BOOKING_NOT_CHANGEABLE: "Цей запис уже не можна змінити. Оновіть сторінку.",
+  OWN_BUSINESS: "Це ваш бізнес. Додайте запис у Календарі.",
 };
 
 export const DEFAULT_ERROR = "Помилка. Спробуйте ще раз.";
