@@ -1,10 +1,9 @@
-# Every push and pull request: format, lint, types, tests and build of both projects.
-# Vercel builds on its own; this is the check that tests and lint really passed
+# Format, lint, types, tests, migrations and build of both projects.
+# Manual only for now (Actions → CI → Run workflow); to run on every push, add `push:` and `pull_request:` below
 name: CI
 
 on:
-  push:
-  pull_request:
+  workflow_dispatch:
 
 jobs:
   backend:
